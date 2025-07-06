@@ -6,11 +6,11 @@ from utils.background import remove_bg_add_new
 from utils.enhance import enhance_image
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})  # Wide-open CORS for testing
 
 @app.route("/", methods=["GET"])
 def health():
-    return jsonify({"message": "Image Edit Service is live!"})
+    return jsonify({"message": "✅ Image Edit Service is live!"})
 
 @app.route("/remove-bg", methods=["POST"])
 def remove_background():
@@ -34,26 +34,32 @@ def remove_background():
                 bg_image.save(bg_image_path)
 
             remove_bg_add_new(input_path, output_path, bg_color, bg_image_path)
-            return send_file(output_path, download_name="no_bg.png")
+
+            return send_file(output_path, mimetype="image/png", download_name="no_bg.png")
     except Exception as e:
-        print("Error in /remove-bg:", e)
-        return jsonify({"error": "Editing failed. Try again."}), 500
+        print("🔥 Error in /remove-bg:", str(e))
+        return jsonify({"error": f"Editing failed. Reason: {str(e)}"}), 500
 
 
 @app.route("/enhance", methods=["POST"])
 def enhance():
-    file = request.files.get("file")
-    if not file:
-        return jsonify({"error": "No image uploaded"}), 400
+    try:
+        file = request.files.get("file")
+        if not file:
+            return jsonify({"error": "No image uploaded"}), 400
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        input_path = os.path.join(tmpdir, file.filename)
-        output_path = os.path.join(tmpdir, "enhanced.jpg")
-        file.save(input_path)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = os.path.join(tmpdir, file.filename)
+            output_path = os.path.join(tmpdir, "enhanced.jpg")
+            file.save(input_path)
 
-        enhance_image(input_path, output_path)
-        return send_file(output_path, download_name="enhanced.jpg")
+            enhance_image(input_path, output_path)
+
+            return send_file(output_path, mimetype="image/jpeg", download_name="enhanced.jpg")
+    except Exception as e:
+        print("🔥 Error in /enhance:", str(e))
+        return jsonify({"error": f"Enhancement failed. Reason: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Render sets this environment variable
+    port = int(os.environ.get("PORT", 5000))  # Render sets PORT
     app.run(host="0.0.0.0", port=port)
