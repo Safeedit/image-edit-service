@@ -14,26 +14,31 @@ def health():
 
 @app.route("/remove-bg", methods=["POST"])
 def remove_background():
-    file = request.files.get("file")
-    bg_color = request.form.get("bg_color")
-    bg_image = request.files.get("bg_image")
+    try:
+        file = request.files.get("file")
+        bg_color = request.form.get("bg_color")
+        bg_image = request.files.get("bg_image")
 
-    if not file:
-        return jsonify({"error": "No image uploaded"}), 400
+        if not file:
+            return jsonify({"error": "No image uploaded"}), 400
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        input_path = os.path.join(tmpdir, file.filename)
-        file.save(input_path)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = os.path.join(tmpdir, file.filename)
+            file.save(input_path)
 
-        output_path = os.path.join(tmpdir, "output.png")
-        bg_image_path = None
+            output_path = os.path.join(tmpdir, "output.png")
+            bg_image_path = None
 
-        if bg_image:
-            bg_image_path = os.path.join(tmpdir, "bg.jpg")
-            bg_image.save(bg_image_path)
+            if bg_image:
+                bg_image_path = os.path.join(tmpdir, "bg.jpg")
+                bg_image.save(bg_image_path)
 
-        remove_bg_add_new(input_path, output_path, bg_color, bg_image_path)
-        return send_file(output_path, download_name="no_bg.png")
+            remove_bg_add_new(input_path, output_path, bg_color, bg_image_path)
+            return send_file(output_path, download_name="no_bg.png")
+    except Exception as e:
+        print("Error in /remove-bg:", e)
+        return jsonify({"error": "Editing failed. Try again."}), 500
+
 
 @app.route("/enhance", methods=["POST"])
 def enhance():
