@@ -8,11 +8,15 @@ from utils.enhance import enhance_image
 app = Flask(__name__)
 CORS(app)
 
+@app.route("/", methods=["GET"])
+def health():
+    return jsonify({"message": "Image Edit Service is live!"})
+
 @app.route("/remove-bg", methods=["POST"])
 def remove_background():
     file = request.files.get("file")
-    bg_color = request.form.get("bg_color")  # Optional
-    bg_image = request.files.get("bg_image")  # Optional
+    bg_color = request.form.get("bg_color")
+    bg_image = request.files.get("bg_image")
 
     if not file:
         return jsonify({"error": "No image uploaded"}), 400
@@ -46,4 +50,5 @@ def enhance():
         return send_file(output_path, download_name="enhanced.jpg")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
