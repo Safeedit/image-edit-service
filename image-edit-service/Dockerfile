@@ -1,18 +1,26 @@
+# Base image with Python
 FROM python:3.11-slim
 
-# Set working directory
+# Avoid prompts during build and set working directory
+ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /app
 
-# Copy project files
-COPY . .
+# Install required OS libraries for OpenCV and Pillow
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install OS dependencies for OpenCV and PIL
-RUN apt-get update && \
-    apt-get install -y libgl1 libglib2.0-0 && \
+# Install Python dependencies early to leverage Docker cache
+COPY requirements.txt .
+RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Expose the port Render will bind to (use 5000, not 5001)
+# Copy the rest of your code
+COPY . .
+
+# Expose Flask port (Render uses 5000)
 EXPOSE 5000
 
-# Run the Flask app
+# Run your app
 CMD ["python", "app.py"]
