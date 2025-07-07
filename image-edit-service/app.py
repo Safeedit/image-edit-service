@@ -2,14 +2,14 @@ from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 import os
 import tempfile
-from utils.background import remove_bg_add_new  # ✅ Only this is needed now
+from utils.background import remove_bg_add_new
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
 @app.route("/", methods=["GET"])
 def health():
-    return jsonify({"message": "✅ BG Removal Service is live!"})
+    return jsonify({"message": "✅ Image Edit Service is live!"})
 
 @app.route("/remove-bg", methods=["POST"])
 def remove_background():
@@ -37,7 +37,7 @@ def remove_background():
             return send_file(output_path, mimetype="image/png", download_name="no_bg.png")
     except Exception as e:
         print("🔥 Error in /remove-bg:", str(e))
-        return jsonify({"error": f"BG removal failed: {str(e)}"}), 500
+        return jsonify({"error": f"Editing failed. Reason: {str(e)}"}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
