@@ -1,6 +1,37 @@
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
+
+# Environment files
 .env
+.env.*
+
+# Python virtual environments
+.venv/
+venv/
+ENV/
+
+# Docker + System
+Dockerfile
+.dockerignore
+*.log
+*.bak
+
+# Git
+.git/
+.gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.vscode/
+.idea/
+
+# Tests and temp files
+*.swp
+*.tmp
+*.test.*
