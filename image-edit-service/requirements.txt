@@ -3,3 +3,4 @@ flask-cors
 rembg
 opencv-python-headless
 Pillow
+onnxruntime
