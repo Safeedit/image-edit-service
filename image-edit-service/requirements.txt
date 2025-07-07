@@ -2,5 +2,4 @@ flask
 flask-cors
 rembg
 Pillow
-opencv-python
 onnxruntime
